@@ -76,15 +76,21 @@ pooledSigmaInv = inv(pooledSigma);
 
 %%
 
+% Converting from int8 to double.
+
 multiImDouble = double(multiIm);
 
 %%
+
+% Defining the S-functions. 
 
 Sf_fat = @(x) permute(x,[1,3,2])*pooledSigmaInv*permute(meanFat,[2,1])-(1/2)*meanFat*pooledSigmaInv*permute(meanFat,[2,1]);
 
 Sf_meat = @(x) permute(x,[1,3,2])*pooledSigmaInv*permute(meanMeat,[2,1])-(1/2)*meanMeat*pooledSigmaInv*permute(meanMeat,[2,1]);
 
 %%
+
+% Computing Sfat and Smeat for each pixel. 
 
 Sfat = zeros(514);
 Smeat = zeros(514);
@@ -98,9 +104,13 @@ end
 
 %%
 
+% Computing difference. If Sdif > 1 the probability for meat is largest. 
+
 Sdif = Smeat./Sfat;
 
 %%
+
+% Coloring in every meat pixel. 
 
 sClass = zeros(514);
 
@@ -111,5 +121,7 @@ for i = 1:514
         end
     end
 end
+
+%% 
 
 imagesc(fatClass);
