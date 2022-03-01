@@ -57,7 +57,8 @@ for i = 1:514
     end
 end
 
-imagesc(fatClass);
+figure(1);
+imshow(fatClass);
 
 %%
 
@@ -124,4 +125,5 @@ end
 
 %% 
 
-imagesc(fatClass);
+figure(2);
+imshow(sClass);
