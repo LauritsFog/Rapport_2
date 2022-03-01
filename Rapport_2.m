@@ -96,3 +96,20 @@ for i = 1:514
     end
 end
 
+%%
+
+Sdif = Smeat./Sfat;
+
+%%
+
+sClass = zeros(514);
+
+for i = 1:514
+    for j = 1:514
+        if Sdif(i,j) > 1
+            sClass(i,j) = 1;
+        end
+    end
+end
+
+imagesc(fatClass);
