@@ -42,4 +42,21 @@ for l = 1:18
 end
 
 plot(errorRate);
+
+%%
+
+fatClass = zeros(514);
+
+% Classifying every fat-pixel and giving it value 1. 
+
+for i = 1:514
+    for j = 1:514
+        if multiIm(i,j,idx) < meanThresholds(idx)
+            fatClass(i,j) = 1;
+        end
+    end
+end
+
+imagesc(fatClass);
+
         
