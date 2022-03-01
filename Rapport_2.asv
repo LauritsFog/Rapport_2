@@ -76,23 +76,9 @@ pooledSigmaInv = inv(pooledSigma);
 
 %%
 
-multiImDouble = double(multiIm);
+Sfat = @(x) x'*pooledSigmaInv*meanFat-(1/2).*meanFat'*pooledSigmaInv*meanFat;
+
+Smeat = @(x) x'*pooledSigmaInv*meanMeat-(1/2).*meanMeat'*pooledSigmaInv*meanMeat;
 
 %%
-
-Sf_fat = @(x) permute(x,[1,3,2])*pooledSigmaInv*permute(meanFat,[2,1])-(1/2)*meanFat*pooledSigmaInv*permute(meanFat,[2,1]);
-
-Sf_meat = @(x) permute(x,[1,3,2])*pooledSigmaInv*permute(meanMeat,[2,1])-(1/2)*meanMeat*pooledSigmaInv*permute(meanMeat,[2,1]);
-
-%%
-
-Sfat = zeros(514);
-Smeat = zeros(514);
-
-for i = 1:514
-    for j = 1:514
-        Sfat(i,j) = Sf_fat(multiImDouble(i,j,:));
-        Smeat(i,j) = Sf_meat(multiImDouble(i,j,:));
-    end
-end
 
