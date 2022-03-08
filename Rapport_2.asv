@@ -188,7 +188,7 @@ for k = 1:5
         end
     end
     
-    % Computing S-values for every pixel.
+    % Computing 
     
     Sfat = zeros(514);
     Smeat = zeros(514);
@@ -201,8 +201,6 @@ for k = 1:5
     end
 
     Sdif = Smeat./Sfat;
-    
-    % Classifying pixels using advanced model. 
 
     sClass = zeros(514);
 
@@ -217,8 +215,6 @@ for k = 1:5
     subplot(2,3,k);
     imshow(sClass);
     title(strcat('Day',{' '}, int2str(days(k))));
-    
-    % Counting errors using advanced model.
     
     for i = 1:514
         for j = 1:514
