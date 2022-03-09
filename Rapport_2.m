@@ -18,6 +18,7 @@ hold on
 plot(mean(fatPix), 'r');
 hold on 
 plot(meanThresholds,'g');
+legend('Fat pixels','Meat pixels','Thresholds');
 
 %%
 
@@ -27,17 +28,19 @@ plot(meanThresholds,'g');
 errorRate = zeros(1,19);
 
 for l = 1:18
-    for p = 1:756
+    for p = 1:length(fatPix)
         if fatPix(p,l) < meanThresholds(l)
             errorRate(l) = errorRate(l) + 1;
         end
+    end
+    for p = 1:length(meatPix)
         if meatPix(p,l) > meanThresholds(l)
             errorRate(l) = errorRate(l) + 1;
         end
     end
 end
 
-figure (2)
+figure(2)
 plot(errorRate);
 title('Error rate');
 
