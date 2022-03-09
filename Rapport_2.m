@@ -21,7 +21,6 @@ meanThresholds = (mean(fatPix)+mean(meatPix))/2;
 
 %%
 
-figure(1)
 figure (1)
 plot(mean(meatPix), 'b');
 hold on
@@ -64,7 +63,6 @@ multiImDouble = double(multiIm);
 
 meatClass = zeros(514);
 
-% Classifying every meat-pixel and giving it value 1. 
 % Classifying every fat-pixel and giving it value 1. 
 
 for i = 1:514
