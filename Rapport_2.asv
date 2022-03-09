@@ -33,16 +33,15 @@ for l = 1:18
             errorRate(l) = errorRate(l) + 1;
         end
     end
-    for p = 1:length(meanPix)
+    for p = 1:length(meatPix)
         if meatPix(p,l) > meanThresholds(l)
             errorRate(l) = errorRate(l) + 1;
         end
     end
 end
 
-figure (2)
+figure(2)
 plot(errorRate);
-title('Error rate');
 
 %%
 
@@ -235,18 +234,24 @@ pFat = 0.3;
 pMeat = 0.7;
 
 days = [1,6,13,20,28];
-absErrorsAdv = zeros(5,5);
-absErrorsSimple = zeros(5,5);
+absErrorsMeatAdv = zeros(5,5);
+absErrorsFatAdv = zeros(5,5);
+
+absErrorsMeatSimple = zeros(5,5);
+absErrorsFatSimple = zeros(5,5);
+
 numPixels = zeros(1,5);
             
-for d = 1:5 % Looping through each day.
+for d = 1:5 % Looping through each day for training. 
     [multiIm, annotationIm] = loadMulti(strcat('multispectral_day',sprintf('%02d',days(d)),'.mat'),strcat('annotation_day',sprintf('%02d',days(d)),'.png'));
     
     [Sf_fat,Sf_meat] = computeSFunctions(multiIm,annotationIm,pFat,pMeat);
     
     [meanThresholds,idx] = computeMeanThresholds(multiIm,annotationIm);
     
-    for k = 1:5
+    numPixels(d) = nnz(annotationIm(:,:,2)+annotationIm(:,:,3));
+    
+    for k = 1:5 % Looping through ea
         if k ~= d % Counting errors during classification of images from other days. 
             [multiIm, annotationIm] = loadMulti(strcat('multispectral_day',sprintf('%02d',days(k)),'.mat'),strcat('annotation_day',sprintf('%02d',days(k)),'.png'));
 
@@ -293,22 +298,34 @@ for d = 1:5 % Looping through each day.
                     end
                 end
             end
+            
+            misClassMeatSimple = getPix(annotationIm(:,:,3),simpleClass);
+            misClassFatSimple = getPix(annotationIm(:,:,2),~simpleClass);
+            
+            misClassMeatAdv = getPix(annotationIm(:,:,3),advClass);
+            misClassFatAdv = getPix(annotationIm(:,:,2),~advClass);
+            
+            absErrorsMeatSimple(d,k) = nnz(misClassMeatSimple);
+            absErrorsFatSimple(d,k) = nnz(misClassFatSimple);
+            
+            absErrorsMeatAdv(d,k) = nnz(misClassMeatAdv);
+            absErrorsFatAdv(d,k) = nnz(misClassFatAdv);
 
-            for i = 1:514
-                for j = 1:514
-                    if annotationIm(i,j,3) == 1 || annotationIm(i,j,2) == 1
-                        numPixels(k) = numPixels(k) + 1;
-                    end
-                    % Counting errors using simple model.
-                    if (annotationIm(i,j,3) == 1 && simpleClass(i,j) == 0) || (annotationIm(i,j,2) == 1 && simpleClass(i,j) == 1)
-                        absErrorsSimple(d,k) = absErrorsSimple(d,k) + 1;
-                    end
-                    % Counting errors using advanced model.
-                    if (annotationIm(i,j,3) == 1 && advClass(i,j) == 0) || (annotationIm(i,j,2) == 1 && advClass(i,j) == 1)
-                        absErrorsAdv(d,k) = absErrorsAdv(d,k) + 1;
-                    end
-                end
-            end
+%             for i = 1:514
+%                 for j = 1:514
+%                     if annotationIm(i,j,3) == 1 || annotationIm(i,j,2) == 1
+%                         numPixels(k) = numPixels(k) + 1;
+%                     end
+%                     % Counting errors using simple model.
+%                     if (annotationIm(i,j,3) == 1 && simpleClass(i,j) == 0) || (annotationIm(i,j,2) == 1 && simpleClass(i,j) == 1)
+%                         absErrorsSimple(d,k) = absErrorsSimple(d,k) + 1;
+%                     end
+%                     % Counting errors using advanced model.
+%                     if (annotationIm(i,j,3) == 1 && advClass(i,j) == 0) || (annotationIm(i,j,2) == 1 && advClass(i,j) == 1)
+%                         absErrorsAdv(d,k) = absErrorsAdv(d,k) + 1;
+%                     end
+%                 end
+%             end
         end
     end
 end
