@@ -5,10 +5,19 @@ addpath(genpath('Matlab'));
 
 [multiIm, annotationIm] = loadMulti('multispectral_day01.mat','annotation_day01.png');
 
-[meanThresholds,idx] = computeMeanThresholds(multiIm, annotationIm);
-
 [fatPix, fatR, fatC] = getPix(multiIm, annotationIm(:,:,2));
 [meatPix, meatR, meatC] = getPix(multiIm, annotationIm(:,:,3));
+
+% Finding spectral band with best discriminative properties for meat and
+% fat. Using mean and median.
+
+meanDif = abs(mean(fatPix)-mean(meatPix));
+
+[maxVal, idx] = max(meanDif);
+
+% Calculating threshold values for day 1. 
+
+meanThresholds = (mean(fatPix)+mean(meatPix))/2;
 
 %%
 
@@ -228,23 +237,18 @@ plot(days,errorRateSimple,'r');
 
 %%
 
-pFat = 0.3;
-pMeat = 0.7;
-
 days = [1,6,13,20,28];
 absErrorsAdv = zeros(5,5);
 absErrorsSimple = zeros(5,5);
 numPixels = zeros(1,5);
             
-for d = 1:5 % Looping through each day.
+for d = 1:5
     [multiIm, annotationIm] = loadMulti(strcat('multispectral_day',sprintf('%02d',days(d)),'.mat'),strcat('annotation_day',sprintf('%02d',days(d)),'.png'));
     
     [Sf_fat,Sf_meat] = computeSFunctions(multiIm,annotationIm,pFat,pMeat);
     
-    [meanThresholds,idx] = computeMeanThresholds(multiIm,annotationIm);
-    
     for k = 1:5
-        if k ~= d % Counting errors during classification of images from other days. 
+        if k ~= d
             [multiIm, annotationIm] = loadMulti(strcat('multispectral_day',sprintf('%02d',days(k)),'.mat'),strcat('annotation_day',sprintf('%02d',days(k)),'.png'));
 
             multiImDouble = double(multiIm);
@@ -325,6 +329,3 @@ for i = 1:5
     plot(days,errorRateSimple(i,:),'r');
     title(strcat('Trained on day',{' '}, int2str(days(i))));
 end
-
-%%
-
