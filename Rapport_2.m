@@ -22,10 +22,10 @@ meanThresholds = (mean(fatPix)+mean(meatPix))/2;
 %%
 
 figure(1)
+figure (1)
 plot(mean(meatPix), 'b');
 hold on
 plot(mean(fatPix), 'r');
-title('Mean fatPix vs mean meatPix');
 
 %%
 
@@ -42,10 +42,9 @@ for l = 1:18
     end
 end
 
-%%
-
-figure(2)
+figure (2)
 plot(errorRate);
+<<<<<<< HEAD
 title('Error rate');
 %%
 
@@ -58,26 +57,37 @@ background = sum(annotationIm,3);
 % Converting from int8 to double.
 
 multiImDouble = double(multiIm);
+=======
+>>>>>>> de66e9bc8db9e609d9b484a8969a75b747a0b023
 
 %%
 
 meatClass = zeros(514);
 
 % Classifying every meat-pixel and giving it value 1. 
+% Classifying every fat-pixel and giving it value 1. 
 
 for i = 1:514
     for j = 1:514
+<<<<<<< HEAD
         if multiImDouble(i,j,idx) < meanThresholds(idx) && background(i,j) == 1
             meatClass(i,j) = 1;
+=======
+        if multiIm(i,j,idx) < meanThresholds(idx)
+            fatClass(i,j) = 1;
+>>>>>>> de66e9bc8db9e609d9b484a8969a75b747a0b023
         end
     end
 end
 
-%%
-
 figure(3);
+<<<<<<< HEAD
 imshow(meatClass);
 title('Meat-pixels classified and colored white with simple model');
+=======
+colorbar
+imshow(fatClass);
+>>>>>>> de66e9bc8db9e609d9b484a8969a75b747a0b023
 
 %%
 
@@ -96,10 +106,19 @@ pooledSigmaInv = inv(pooledSigma);
 
 %%
 
+<<<<<<< HEAD
+=======
+% Converting from int8 to double.
+
+multiImDouble = double(multiIm);
+
+%%
+
+>>>>>>> de66e9bc8db9e609d9b484a8969a75b747a0b023
 % Defining the S-functions. 
 
 Sf_fat = @(x) permute(x,[1,3,2])*pooledSigmaInv*permute(meanFat,[2,1])-(1/2)*meanFat*pooledSigmaInv*permute(meanFat,[2,1]);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
 Sf_meat = @(x) permute(x,[1,3,2])*pooledSigmaInv*permute(meanMeat,[2,1])-(1/2)*meanMeat*pooledSigmaInv*permute(meanMeat,[2,1]);
 
 %%
@@ -126,18 +145,28 @@ Sdif = Smeat./Sfat;
 
 % Coloring in every meat pixel. 
 
+<<<<<<< HEAD
 advClassDay1 = zeros(514);
 
 for i = 1:514
     for j = 1:514
         if Sdif(i,j) > 1 && background(i,j) == 1
             advClassDay1(i,j) = 1;
+=======
+sClass = zeros(514);
+
+for i = 1:514
+    for j = 1:514
+        if Sdif(i,j) > 1
+            sClass(i,j) = 1;
+>>>>>>> de66e9bc8db9e609d9b484a8969a75b747a0b023
         end
     end
 end
 
 %% 
 
+<<<<<<< HEAD
 figure(4);
 imshow(advClassDay1);
 title('Meat-pixels classified and colored white with advanced model');
@@ -250,4 +279,13 @@ hold on
 plot(days,errorRateSimple,'r');
 
 %%
+=======
+figure(5);
+imshow(sClass);
+
+
+
+
+
+>>>>>>> de66e9bc8db9e609d9b484a8969a75b747a0b023
 
