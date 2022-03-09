@@ -228,8 +228,8 @@ plot(days,errorRateSimple,'r');
 
 %%
 
-pFat = 0.3;
-pMeat = 0.7;
+pFat = 0.5;
+pMeat = 0.5;
 
 days = [1,6,13,20,28];
 absErrorsAdv = zeros(5,5);
@@ -320,11 +320,22 @@ errorRateSimple = absErrorsSimple./numPixels;
 for i = 1:5
     figure(8)
     subplot(1,5,i);
-    plot(days,errorRateAdv(i,:),'b');
+    bar(days,errorRateAdv(i,:),'b');
     hold on
-    plot(days,errorRateSimple(i,:),'r');
+    bar(days,errorRateSimple(i,:),'r');
     title(strcat('Trained on day',{' '}, int2str(days(i))));
+    legend('Advanced model','Simple model')
 end
 
 %%
+
+for i = 1:5
+    figure (9)
+    subplot(1,5,i);
+    y = [errorRateAdv(i,:);errorRateSimple(i,:)]';
+    bar(days,y)
+    ylim([0.0 0.037])
+    title(strcat('Trained on day',{' '}, int2str(days(i))));
+end
+legend('Advanced model','Simple model')
 
