@@ -21,10 +21,12 @@ meanThresholds = (mean(fatPix)+mean(meatPix))/2;
 
 %%
 
-figure
+figure (1)
 plot(mean(meatPix), 'b');
 hold on
 plot(mean(fatPix), 'r');
+hold on 
+plot(meanThresholds,'y');
 
 %%
 
@@ -41,6 +43,7 @@ for l = 1:18
     end
 end
 
+figure (2)
 plot(errorRate);
 
 %%
@@ -57,7 +60,8 @@ for i = 1:514
     end
 end
 
-figure(1);
+figure(3);
+colorbar
 imshow(fatClass);
 
 %%
@@ -125,5 +129,11 @@ end
 
 %% 
 
-figure(2);
+figure(5);
 imshow(sClass);
+
+
+
+
+
+
