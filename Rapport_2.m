@@ -25,6 +25,8 @@ figure (1)
 plot(mean(meatPix), 'b');
 hold on
 plot(mean(fatPix), 'r');
+hold on 
+plot(meanThresholds,'y');
 
 %%
 
