@@ -22,6 +22,21 @@ legend('Fat pixels','Meat pixels','Thresholds');
 
 %%
 
+figure(2)
+plot(showHistograms(multiIm,annotationIm(:,:,3),idx,false),'b');
+hold on
+plot(showHistograms(multiIm,annotationIm(:,:,2),idx,false),'r');
+hold on
+xline(mean(meatPix(:,idx)),'b');
+hold on
+xline(mean(fatPix(:,idx)),'r');
+hold on
+xline(meanThresholds(idx),'k');
+xlim([5 65]);
+legend('Meat','Fat');
+
+%%
+
 % For each spectral layer, the number of fat and meat pixels on the 'wrong'
 % side of the threshold i counted. 
 
@@ -230,8 +245,8 @@ plot(days,errorRateSimple,'r');
 
 %%
 
-pFat = 0.5;
-pMeat = 0.5;
+pFat = 0.3;
+pMeat = 0.7;
 
 days = [1,6,13,20,28];
 absErrorsMeatAdv = zeros(5,5);
@@ -240,7 +255,16 @@ absErrorsFatAdv = zeros(5,5);
 absErrorsMeatSimple = zeros(5,5);
 absErrorsFatSimple = zeros(5,5);
 
-numPixels = zeros(1,5);
+errorRateMeatAdv = zeros(5,5);
+errorRateFatAdv = zeros(5,5);
+errorRateAdv = zeros(5,5);
+
+errorRateMeatSimple = zeros(5,5);
+errorRateFatSimple = zeros(5,5);
+errorRateSimple = zeros(5,5);
+
+numPixelsMeat = zeros(1,5);
+numPixelsFat = zeros(1,5);
             
 for d = 1:5 % Looping through each day for training. 
     [multiIm, annotationIm] = loadMulti(strcat('multispectral_day',sprintf('%02d',days(d)),'.mat'),strcat('annotation_day',sprintf('%02d',days(d)),'.png'));
@@ -248,9 +272,7 @@ for d = 1:5 % Looping through each day for training.
     [Sf_fat,Sf_meat] = computeSFunctions(multiIm,annotationIm,pFat,pMeat);
     
     [meanThresholds,idx] = computeMeanThresholds(multiIm,annotationIm);
-    
-    numPixels(d) = nnz(annotationIm(:,:,2)+annotationIm(:,:,3));
-    
+            
     for k = 1:5 % Looping through every other day for classification. 
         if k ~= d % Counting errors during classification of images from other days. 
             [multiIm, annotationIm] = loadMulti(strcat('multispectral_day',sprintf('%02d',days(k)),'.mat'),strcat('annotation_day',sprintf('%02d',days(k)),'.png'));
@@ -258,6 +280,9 @@ for d = 1:5 % Looping through each day for training.
             multiImDouble = double(multiIm);
 
             background = sum(annotationIm,3);
+            
+            numPixelsMeat(k) = nnz(annotationIm(:,:,3));
+            numPixelsFat(k) = nnz(annotationIm(:,:,2));
 
             simpleClass = zeros(514);
 
@@ -299,6 +324,21 @@ for d = 1:5 % Looping through each day for training.
                 end
             end
             
+%             for i = 1:514
+%                 for j = 1:514
+%                     if (annotationIm(i,j,3) == 1 && simpleClass(i,j) == 0)
+%                         absErrorsMeatSimple(d,k) = absErrorsMeatSimple(d,k) + 1;
+%                     elseif (annotationIm(i,j,2) == 1 && simpleClass(i,j) == 1)
+%                         absErrorsFatSimple(d,k) = absErrorsFatSimple(d,k) + 1;
+%                     end
+%                     if (annotationIm(i,j,3) == 1 && advClass(i,j) == 0)
+%                         absErrorsMeatAdv(d,k) = absErrorsMeatAdv(d,k) + 1;
+%                     elseif (annotationIm(i,j,2) == 1 && advClass(i,j) == 1)
+%                         absErrorsFatAdv(d,k) = absErrorsFatAdv(d,k) + 1;
+%                     end
+%                 end
+%             end
+                         
             misClassMeatSimple = getPix(annotationIm(:,:,3),~simpleClass);
             misClassFatSimple = getPix(annotationIm(:,:,2),simpleClass);
             
@@ -311,34 +351,17 @@ for d = 1:5 % Looping through each day for training.
             absErrorsMeatAdv(d,k) = nnz(misClassMeatAdv);
             absErrorsFatAdv(d,k) = nnz(misClassFatAdv);
 
-%             for i = 1:514
-%                 for j = 1:514
-%                     if annotationIm(i,j,3) == 1 || annotationIm(i,j,2) == 1
-%                         numPixels(k) = numPixels(k) + 1;
-%                     end
-%                     % Counting errors using simple model.
-%                     if (annotationIm(i,j,3) == 1 && simpleClass(i,j) == 0) || (annotationIm(i,j,2) == 1 && simpleClass(i,j) == 1)
-%                         absErrorsSimple(d,k) = absErrorsSimple(d,k) + 1;
-%                     end
-%                     % Counting errors using advanced model.
-%                     if (annotationIm(i,j,3) == 1 && advClass(i,j) == 0) || (annotationIm(i,j,2) == 1 && advClass(i,j) == 1)
-%                         absErrorsAdv(d,k) = absErrorsAdv(d,k) + 1;
-%                     end
-%                 end
-%             end
+            errorRateMeatAdv(d,k) = absErrorsMeatAdv(d,k)/numPixelsMeat(k);
+            errorRateFatAdv(d,k) = absErrorsFatAdv(d,k)/numPixelsFat(k);
+            errorRateAdv(d,k) = (absErrorsMeatAdv(d,k)+absErrorsFatAdv(d,k))/(numPixelsFat(k)+numPixelsMeat(k));
+
+            errorRateMeatSimple(d,k) = absErrorsMeatSimple(d,k)/numPixelsMeat(k);
+            errorRateFatSimple(d,k) = absErrorsFatSimple(d,k)/numPixelsFat(k);
+            errorRateSimple(d,k) = (absErrorsMeatSimple(d,k)+absErrorsFatSimple(d,k))/(numPixelsFat(k)+numPixelsMeat(k));
+
         end
     end
 end
-
-%%
-
-errorRateMeatAdv = absErrorsMeatAdv./numPixels;
-errorRateFatAdv = absErrorsFatAdv./numPixels;
-errorRateAdv = errorRateMeatAdv+errorRateFatAdv;
-
-errorRateMeatSimple = absErrorsMeatSimple./numPixels;
-errorRateFatSimple = absErrorsFatSimple./numPixels;
-errorRateSimple = errorRateMeatSimple+errorRateFatSimple;
 
 %%
 
@@ -355,12 +378,42 @@ end
 %%
 
 for i = 1:5
-    figure (9)
+    figure (10)
     subplot(1,5,i);
     y = [errorRateAdv(i,:);errorRateSimple(i,:)]';
     bar(days,y)
-    ylim([0.0 0.037])
+    ylim([0.0 0.15])
     title(strcat('Trained on day',{' '}, int2str(days(i))));
 end
 legend('Advanced model','Simple model')
 
+%%
+
+meanErrorRateSimple = mean(errorRateSimple,2);
+meanErrorRateAdv = mean(errorRateAdv,2);
+
+%%
+
+% Used for comparing with and wihtout prior. 
+
+meanErrorRateAdv2 = mean(errorRateAdv,2);
+
+%%
+
+meanErrorRateAdvDif = meanErrorRateAdv-meanErrorRateAdv2;
+
+%%
+
+figure(13)
+bar(days,meanErrorRateAdv);
+hold on
+bar(days,meanErrorRateAdvDif);
+legend('Advanced model with prior','Difference without prior')
+
+%%
+
+figure(11);
+bar(days,[meanErrorRateAdv,meanErrorRateSimple]);
+legend('Advanced model','Simple model')
+
+%%
